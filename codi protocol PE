@@ -1,0 +1,120 @@
+#include <iostream>
+#include <vector>
+#include <set>
+#include <ctime> // Inclusión para hacer mediciones de tiempo
+#include <stdlib.h> // Inclusión para random numbers
+using namespace std;
+
+int N_EXPERIMENTOS = 10; 
+srand(time(NULL));
+
+int crear_numeros() {
+    return rand();
+}
+
+void inicializar(vector<int>& vec, set<int>& set_vec) {
+    // INICIALIZA EL VECTOR Y EL SET CON LOS MISMO 10 ELEMENTOS
+    for (int i = 0; i < 10; ++i) {
+        int num = rand();
+        v[i] = num;
+        set_vec.insert(num);
+    }
+}
+
+void delete_from_vector(vector<int>& vec, int search2) {
+    for (int i = search2; i < vec.size()-1; ++i) {
+        vec[i] = vec[i+1];
+    }
+    vec.pop_back();
+}
+
+double exec_time(double old, double current) {
+    return (current-old)/CLOCKS_PER_SEC;
+}
+
+int main () {
+    vector<int> vec(10);
+    set<int> set_vec;
+    inicializar(vec, set_vec);
+    for (int i = 0; i < N_EXPERIMENTOS; ++i) {
+        int n = crear_numeros(); // Creación de números aleatorios
+        int search = crear_numeros(); // Número aleatorio para búsqueda
+        int search2 = rand()%vec.size(); // Posición aleatoria del vector
+        int num_search = vec[search2];
+        
+
+        // Gestión con la clase <vector>
+        // -----------------------------------------------------------------
+        double clock_old = clock();
+        
+        vec.push_back(n); // INSERCIÓN
+        vec[vec.size()-1] = 0; // MODIFICACIÓN
+
+        // BUSQUEDA POTENCIALMENTE FALLIDA
+        bool found = false;
+        int i = 0;
+        while (i<vec.size() and not found) {
+            if (vec[i] == search) found = true;
+            ++i;
+        }
+        if (found) {
+            // ACCIÓN IRRELEVANTE
+        }
+        else {
+            // ACCIÓN IRRELEVANTE
+        }
+        
+        // BUSQUEDA ACERTADA
+        i = 0;
+        found = false;
+        while (i<vec.size() and not found) {
+            if (vec[i] == vec[search2]) found = true;
+            ++i;
+        }
+        if (found) {
+            // ACCIÓN IRRELEVANTE
+        }
+        else {
+            // ACCIÓN IRRELEVANTE
+        }
+        
+        // ELIMINAR
+        delete_from_vector(vec, search2);
+
+        double clock_current = clock();
+
+        cout << exec_time(clock_old, clock_current) << endl; // TIEMPO
+
+        // -----------------------------------------------------------------
+        
+
+        
+        // Gestión con la clase <set>
+        // -----------------------------------------------------------------
+        clock_old = clock();
+        
+        // INSERCIÓN
+        set_vec.insert(n);
+
+        // MODIFICACIÓN
+        set_vec.erase(set_vec.find(n));
+        set_vec.insert(0);
+
+        // BUSQUEDA POTENCIALMENTE FALLIDA
+        set<int>::iterator it = set_vec.find(n);
+        found = (it != set_vec.end()) ? true : false;
+
+        // BUSQUEDA ACERTADA
+        it = set_vec.find(vec[search2]);
+        found = (it != set_vec.end()) ? true : false;
+
+        // ELIMINAR
+        set_vec.erase(num_search);
+
+        clock_current = clock();
+
+        cout << exec_time(clock_old, clock_current) << endl; // TIEMPO
+
+        // -----------------------------------------------------------------
+    }
+}
