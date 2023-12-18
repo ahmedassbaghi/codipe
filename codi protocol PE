@@ -1,12 +1,13 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include <climits>
 #include <ctime> // Inclusión para hacer mediciones de tiempo
 #include <time.h> // Inclusión para hacer mediciones de tiempo
 #include <stdlib.h> // Inclusión para random numbers
 using namespace std;
 
-int N_EXPERIMENTOS = 60; 
+int N_EXPERIMENTOS = 20; 
 
 int crear_numeros() {
     return rand();
@@ -14,7 +15,16 @@ int crear_numeros() {
 
 void inicializar(vector<int>& vec, set<int>& set_vec) {
     // INICIALIZA EL VECTOR Y EL SET CON LOS MISMO 50 ELEMENTOS
-    for (int i = 0; i < 50; ++i) {
+    for (int i = 0; i < 100; ++i) {
+        int num = rand();
+        vec.push_back(num);
+        set_vec.insert(num);
+    }
+}
+
+void aumentar_tamaño(vector<int>& vec, set<int>& set_vec) {
+    //aumentamos el tamaño del vector y del set en 50 unidades
+    for (int i = 0; i < 100; ++i) {
         int num = rand();
         vec.push_back(num);
         set_vec.insert(num);
@@ -38,89 +48,100 @@ int main () {
     vector<int> vec;
     set<int> set_vec;
     inicializar(vec, set_vec);
-    for (int i = 1; i <= N_EXPERIMENTOS; ++i) {
-        int n = crear_numeros()%INT_MAX; // Creación de números aleatorios
-        int search = crear_numeros(); // Número aleatorio para búsqueda
-        int search2 = rand()%vec.size(); // Posición aleatoria del vector
-        int num_search = vec[search2];
-        
-        cout << i << "   v: ";
 
-        // Gestión con la clase <vector>
-        // -----------------------------------------------------------------
-        double clock_old = clock();
-        
-        vec.push_back(n); // INSERCIÓN
-        vec[vec.size()-1] = 0; // MODIFICACIÓN
+    int n, search, search2, num_search, j, tamaño;
+    tamaño = 0;
+    double clock_old, clock_current;
+    set<int>::iterator it;
 
-        // BUSQUEDA POTENCIALMENTE FALLIDA
-        bool found = false;
-        int j = 0;
-        while (j<vec.size() and not found) {
-            if (vec[j] == search) found = true;
-            ++j;
+    bool found;
+    for (int u = 0; u < 10; ++u) {
+        tamaño += 100;
+        for (int i = 1; i <= N_EXPERIMENTOS; ++i) {
+            n = crear_numeros()%INT_MAX; // Creación de números aleatorios
+            search = crear_numeros(); // Número aleatorio para búsqueda
+            search2 = rand()%vec.size(); // Posición aleatoria del vector
+            num_search = vec[search2];
+            
+            cout << i << "   v: ";
+
+            // Gestión con la clase <vector>
+            // -----------------------------------------------------------------
+            clock_old = clock();
+            
+            vec.push_back(n); // INSERCIÓN
+            vec[vec.size()-1] = 0; // MODIFICACIÓN
+
+            // BUSQUEDA POTENCIALMENTE FALLIDA
+            found = false;
+            j = 0;
+            while (j<vec.size() and not found) {
+                if (vec[j] == search) found = true;
+                ++j;
+            }
+            if (found) {
+                // ACCIÓN IRRELEVANTE
+            }
+            else {
+                // ACCIÓN IRRELEVANTE
+            }
+            
+            // BUSQUEDA ACERTADA
+            j = 0;
+            found = false;
+            while (j<vec.size() and not found) {
+                if (vec[j] == vec[search2]) found = true;
+                ++j;
+            }
+            if (found) {
+                // ACCIÓN IRRELEVANTE
+            }
+            else {
+                // ACCIÓN IRRELEVANTE
+            }
+            
+            // ELIMINAR
+            delete_from_vector(vec, search2);
+
+            clock_current = clock();
+
+            cout << exec_time(clock_old, clock_current) << "   "; // TIEMPO
+
+            // -----------------------------------------------------------------
+            
+
+            
+            // Gestión con la clase <set>
+            // -----------------------------------------------------------------
+            clock_old = clock();
+            
+            // INSERCIÓN
+            set_vec.insert(n);
+
+            // MODIFICACIÓN
+            set_vec.erase(set_vec.find(n));
+            set_vec.insert(0);
+
+            // BUSQUEDA POTENCIALMENTE FALLIDA
+            it = set_vec.find(n);
+            found = (it != set_vec.end()) ? true : false;
+
+            // BUSQUEDA ACERTADA
+            it = set_vec.find(vec[search2]);
+            found = (it != set_vec.end()) ? true : false;
+
+            // ELIMINAR
+            set_vec.erase(num_search);
+
+            clock_current = clock();
+
+            cout << "s: " << exec_time(clock_old, clock_current); // TIEMPO
+
+            cout << "    " << "n" << ": " << tamaño << endl;
+
+            // -----------------------------------------------------------------
         }
-        if (found) {
-            // ACCIÓN IRRELEVANTE
-        }
-        else {
-            // ACCIÓN IRRELEVANTE
-        }
-        
-        // BUSQUEDA ACERTADA
-        j = 0;
-        found = false;
-        while (j<vec.size() and not found) {
-            if (vec[j] == vec[search2]) found = true;
-            ++j;
-        }
-        if (found) {
-            // ACCIÓN IRRELEVANTE
-        }
-        else {
-            // ACCIÓN IRRELEVANTE
-        }
-        
-        // ELIMINAR
-        delete_from_vector(vec, search2);
-
-        double clock_current = clock();
-
-        cout << exec_time(clock_old, clock_current) << "   "; // TIEMPO
-
-        // -----------------------------------------------------------------
-        
-
-        
-        // Gestión con la clase <set>
-        // -----------------------------------------------------------------
-        clock_old = clock();
-        
-        // INSERCIÓN
-        set_vec.insert(n);
-
-        // MODIFICACIÓN
-        set_vec.erase(set_vec.find(n));
-        set_vec.insert(0);
-
-        // BUSQUEDA POTENCIALMENTE FALLIDA
-        set<int>::iterator it = set_vec.find(n);
-        found = (it != set_vec.end()) ? true : false;
-
-        // BUSQUEDA ACERTADA
-        it = set_vec.find(vec[search2]);
-        found = (it != set_vec.end()) ? true : false;
-
-        // ELIMINAR
-        set_vec.erase(num_search);
-
-        clock_current = clock();
-
-        cout << "s: " << exec_time(clock_old, clock_current) << endl; // TIEMPO
-
-        // -----------------------------------------------------------------
+        aumentar_tamaño(vec, set_vec);
     }
+
 }
-
-
-
